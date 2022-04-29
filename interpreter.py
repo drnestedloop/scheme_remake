@@ -1,3 +1,4 @@
+import sys
 import lark
 from builtin_items import *
 
@@ -83,3 +84,11 @@ def evaluate(code, env):
             return intified_number if floatified_number == intified_number else floatified_number
         else:
             return env.lookup(code[:])
+
+
+if __name__ == "__main__":
+    filename = sys.argv[1]  #get the name of the file to execute -- from experiementation if you are running this script
+                            #using python interpreter.py then 'interpreter.py' is the first in argv
+    scheme_script = open(filename, 'r') #open file given in the command line arguments
+    scheme_script = scheme_script.read() #convert file to string
+    evaluate(parser.parse(scheme_script)) #run the code
