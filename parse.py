@@ -6,6 +6,7 @@ grammar = grammar.read()
 
 parser = lark.Lark(grammar)
 
+
 def do_lambda_expression(parts:list, env):
     formals = parts[0]
     assert formals.data[:] == 'call', "Error: Malformed Lambda Expression"
@@ -21,13 +22,24 @@ def do_lambda_expression(parts:list, env):
             evaluate(expr, lambda_frame)
         return evaluate(body_expressions[-1], lambda_frame)
     return lambda_call
-
+#ensure that the only falsy thing in scheme is the litteral #f (False)
+def scheme_boolify(value):
+    if(value is False):
+        return False
+    else:
+        return True
 def do_define(AST, env):
-    if(len(AST.children) != 2):
-        assert False, "Error: malformed define statement"
+    assert len(AST.children) == 2, "Error: malformed define statement"
     #evaluate value to be saved
     value = evaluate(AST.children[1], env)
     return env.define(AST.children[0][:], value)
+def do_if(AST, env):
+    assert len(AST.children) == 3, "Error: malformed if statement"
+    predicate = AST.children[0]
+    if(scheme_boolify(evaluate(predicate, env))):
+        return evaluate(AST.children[1], env)
+    else:
+        return evaluate(AST.children[2], env)
 
 def do_call(AST, env):
     if(type(AST.children[0]) == lark.tree.Tree):
@@ -52,6 +64,8 @@ def evaluate(AST, env): #TODO rename parameter from AST since the input is not a
             return do_lambda_expression(AST.children, env)
         elif(AST.data[:] == 'define'):
             return do_define(AST, env)
+        elif(AST.data[:] == 'if'):
+            return do_if(AST, env)
         elif(AST.data[:] == 'call'):
             return do_call(AST, env)
         elif(AST.data[:] == "multi_expr"):

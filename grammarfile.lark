@@ -1,9 +1,10 @@
 ?start: expr
 MATH_SYMBOL: /[\+\-\*\/]/
 NAME: /[A-Za-z_\?#]+/
-?expr: NAME | NUMBER | MATH_SYMBOL | lambda_expr | define | call | multi_expr | comment
+?expr: NAME | NUMBER | MATH_SYMBOL | lambda_expr | define | if | call | multi_expr | comment
 lambda_expr: "(" "lambda" expr* ")"
 define: "(" "define" NAME expr* ")"
+if: "(if" expr* ")" 
 call: "(" expr* ")"
 multi_expr: (expr ";" expr)*
 comment: "/#" /[A-Za-z0-9\+\-\*\/_\?\|\"\(\)\s\t\.]+/ "#/"
