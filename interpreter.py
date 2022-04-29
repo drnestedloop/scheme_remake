@@ -91,4 +91,4 @@ if __name__ == "__main__":
                             #using python interpreter.py then 'interpreter.py' is the first in argv
     scheme_script = open(filename, 'r') #open file given in the command line arguments
     scheme_script = scheme_script.read() #convert file to string
-    evaluate(parser.parse(scheme_script)) #run the code
+    evaluate(parser.parse(scheme_script), GLOBAL_FRAME) #run the code
