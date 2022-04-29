@@ -6,7 +6,6 @@ grammar = grammar.read()
 
 parser = lark.Lark(grammar)
 
-
 def do_lambda_expression(parts:list, env):
     formals = parts[0]
     assert formals.data[:] == 'call', "Error: Malformed Lambda Expression"
