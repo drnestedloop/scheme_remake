@@ -28,26 +28,26 @@ def scheme_boolify(value):
         return False
     else:
         return True
-def do_define(AST, env):
-    assert len(AST.children) == 2, "Error: malformed define statement"
+def do_define(code, env):
+    assert len(code.children) == 2, "Error: malformed define statement"
     #evaluate value to be saved
-    value = evaluate(AST.children[1], env)
-    return env.define(AST.children[0][:], value)
-def do_if(AST, env):
-    assert len(AST.children) == 3, "Error: malformed if statement"
-    predicate = AST.children[0]
+    value = evaluate(code.children[1], env)
+    return env.define(code.children[0][:], value)
+def do_if(code, env):
+    assert len(code.children) == 3, "Error: malformed if statement"
+    predicate = code.children[0]
     if(scheme_boolify(evaluate(predicate, env))):
-        return evaluate(AST.children[1], env)
+        return evaluate(code.children[1], env)
     else:
-        return evaluate(AST.children[2], env)
+        return evaluate(code.children[2], env)
 
-def do_call(AST, env):
-    if(type(AST.children[0]) == lark.tree.Tree):
-        opperator = evaluate(AST.children[0], env)
+def do_call(code, env):
+    if(type(code.children[0]) == lark.tree.Tree):
+        opperator = evaluate(code.children[0], env)
     else:
-        fname = AST.children[0][:]
+        fname = code.children[0][:]
         opperator = env.lookup(fname)
-    args = AST.children[1:]
+    args = code.children[1:]
     evaled_args = []
     for arg in args:
         evaled = evaluate(arg, env)
@@ -58,28 +58,28 @@ def do_call(AST, env):
     return opperator(evaled_args)
 
 
-def evaluate(AST, env): #TODO rename parameter from AST since the input is not always an AST
-    if(type(AST) == lark.tree.Tree):
-        if(AST.data[:] == 'lambda_expr'):
-            return do_lambda_expression(AST.children, env)
-        elif(AST.data[:] == 'define'):
-            return do_define(AST, env)
-        elif(AST.data[:] == 'if'):
-            return do_if(AST, env)
-        elif(AST.data[:] == 'call'):
-            return do_call(AST, env)
-        elif(AST.data[:] == "multi_expr"):
-            for expr in AST.children:
+def evaluate(code, env): 
+    if(type(code) == lark.tree.Tree):
+        if(code.data[:] == 'lambda_expr'):
+            return do_lambda_expression(code.children, env)
+        elif(code.data[:] == 'define'):
+            return do_define(code, env)
+        elif(code.data[:] == 'if'):
+            return do_if(code, env)
+        elif(code.data[:] == 'call'):
+            return do_call(code, env)
+        elif(code.data[:] == "multi_expr"):
+            for expr in code.children:
                 evaluate(expr, env)
-        elif(AST.data[:] == "comment"):
-            return Comment(AST.children[0][:]) #do nothing, it's a comment
-    elif(type(AST) == lark.lexer.Token):
-        if(AST.type == 'NUMBER'):
+        elif(code.data[:] == "comment"):
+            return Comment(code.children[0][:]) #do nothing, it's a comment
+    elif(type(code) == lark.lexer.Token):
+        if(code.type == 'NUMBER'):
             try:
-                intified_number = int(AST[:])
+                intified_number = int(code[:])
             except ValueError:
                 intified_number = None
-            floatified_number = float(AST[:])
+            floatified_number = float(code[:])
             return intified_number if floatified_number == intified_number else floatified_number
         else:
-            return env.lookup(AST[:])
+            return env.lookup(code[:])
