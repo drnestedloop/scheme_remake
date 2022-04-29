@@ -52,6 +52,7 @@ def scheme_subtract(args):
     for arg in args[1:]:
         i -= arg
     return i
+
 @define_in_global_frame("pow")
 def scheme_exponentiate(args):
     assert len(args) == 2, "Error: Incorrect number of arguments passed to built-in function power"
